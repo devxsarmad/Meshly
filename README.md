@@ -60,6 +60,11 @@ meshly/
 │   │   ├── Dockerfile
 │   │   ├── package.json
 │   │   └── .env.example
+│   ├── cart-service/
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   └── .env.example
 │   ├── product-service/
 │   ├── cart-service/
 │   ├── order-service/
@@ -161,6 +166,7 @@ Through the gateway:
 - `GET /health`
 
 Product catalog endpoints are available through the gateway at `/api/products`.
+Authenticated cart endpoints are available through the gateway at `/api/cart`.
 
 ## Delivery roadmap
 

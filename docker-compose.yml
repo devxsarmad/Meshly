@@ -60,6 +60,33 @@ services:
     ports:
       - "3002:3002"
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  cart-service:
+    build: ./services/cart-service
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      REDIS_URL: redis://redis:6379
+      CART_TTL_SECONDS: 604800
+      JWT_ACCESS_SECRET: change-me-access-secret
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "3003:3003"
+
   api-gateway:
     build: ./api-gateway
     environment:
@@ -67,6 +94,7 @@ services:
       PORT: 3000
       AUTH_SERVICE_URL: http://auth-service:3001
       PRODUCT_SERVICE_URL: http://product-service:3002
+      CART_SERVICE_URL: http://cart-service:3003
       JWT_ACCESS_SECRET: change-me-access-secret
       RATE_LIMIT_WINDOW_MS: 900000
       RATE_LIMIT_MAX: 100
@@ -78,3 +106,4 @@ services:
 volumes:
   postgres-data:
   mongo-data:
+  redis-data:
