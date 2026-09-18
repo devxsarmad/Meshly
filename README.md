@@ -56,6 +56,11 @@ meshly/
 │   │   ├── package.json
 │   │   └── .env.example
 │   ├── product-service/
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   └── .env.example
+│   ├── product-service/
 │   ├── cart-service/
 │   ├── order-service/
 │   ├── payment-service/
@@ -154,6 +159,8 @@ Through the gateway:
 - `POST /api/auth/refresh` — `{ "refreshToken" }`
 - `POST /api/auth/logout` — `{ "refreshToken" }`
 - `GET /health`
+
+Product catalog endpoints are available through the gateway at `/api/products`.
 
 ## Delivery roadmap
 

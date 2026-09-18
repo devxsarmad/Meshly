@@ -32,12 +32,41 @@ services:
     ports:
       - "3001:3001"
 
+  mongodb:
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_DATABASE: meshly_products
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' localhost:27017/meshly_products | grep 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  product-service:
+    build: ./services/product-service
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      MONGODB_URI: mongodb://mongodb:27017/meshly_products
+      JWT_ACCESS_SECRET: change-me-access-secret
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "3002:3002"
+
   api-gateway:
     build: ./api-gateway
     environment:
       NODE_ENV: production
       PORT: 3000
       AUTH_SERVICE_URL: http://auth-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3002
       JWT_ACCESS_SECRET: change-me-access-secret
       RATE_LIMIT_WINDOW_MS: 900000
       RATE_LIMIT_MAX: 100
@@ -48,3 +77,4 @@ services:
 
 volumes:
   postgres-data:
+  mongo-data:
