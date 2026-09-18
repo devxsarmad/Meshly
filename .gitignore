@@ -1,0 +1,6 @@
+**/node_modules/
+dist
+.env
+*.log
+.DS_Store
+services/auth-service/prisma/dev.db
