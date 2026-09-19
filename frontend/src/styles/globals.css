@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1A2B3C;
+  --color-primary-hover: #2C4356;
+  --color-accent: #C65D3B;
+  --color-accent-hover: #A84A2D;
+  --color-background: #FAF7F2;
+  --color-surface: #FFFFFF;
+  --color-border: #E5DFD6;
+  --color-text-primary: #1F1D1B;
+  --color-text-secondary: #6B655C;
+  --color-success: #3D7A5C;
+  --color-error: #B3452F;
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.5rem;
+  --font-size-h4: 1.25rem;
+  --font-size-body: 1rem;
+  --font-size-small: 0.875rem;
+  --line-height-heading: 1.15;
+  --line-height-body: 1.6;
+  --radius-default: 4px;
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --section-spacing: 80px;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--color-background); }
+body { margin: 0; background: var(--color-background); color: var(--color-text-primary); font-family: "IBM Plex Sans", "Avenir Next", Arial, sans-serif; font-size: var(--font-size-body); line-height: var(--line-height-body); }
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
+
+@media (max-width: 640px) { :root { --section-spacing: 48px; } }
