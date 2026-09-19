@@ -1,0 +1,12 @@
+import cors from 'cors';
+import express from 'express';
+import { env } from './config/env';
+import { errorHandler } from './middlewares/error-handler';
+import { orderRouter } from './routes/order-routes';
+export const app = express();
+app.disable('x-powered-by');
+app.use(cors({ origin: env.corsOrigin }));
+app.use(express.json());
+app.get('/health', (_request, response) => response.json({ success: true, message: 'Order service is healthy', data: { service: 'order-service' } }));
+app.use('/api/orders', orderRouter);
+app.use(errorHandler);

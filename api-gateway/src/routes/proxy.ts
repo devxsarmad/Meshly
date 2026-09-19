@@ -6,3 +6,4 @@ export const proxyRouter = Router();
 proxyRouter.use('/auth', createProxyMiddleware({ target: env.authServiceUrl, changeOrigin: true, pathRewrite: { '^/auth': '/api/auth' } }));
 proxyRouter.use('/products', createProxyMiddleware({ target: env.productServiceUrl, changeOrigin: true, pathRewrite: { '^/products': '/api/products' } }));
 proxyRouter.use('/cart', createProxyMiddleware({ target: env.cartServiceUrl, changeOrigin: true, pathRewrite: { '^/cart': '/api/cart' } }));
+proxyRouter.use('/orders', createProxyMiddleware({ target: env.orderServiceUrl, changeOrigin: true, pathRewrite: { '^/orders': '/api/orders' } }));

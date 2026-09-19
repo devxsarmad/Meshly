@@ -65,6 +65,12 @@ meshly/
 │   │   ├── Dockerfile
 │   │   ├── package.json
 │   │   └── .env.example
+│   ├── order-service/
+│   │   ├── src/
+│   │   ├── prisma/
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   └── .env.example
 │   ├── product-service/
 │   ├── cart-service/
 │   ├── order-service/
@@ -167,6 +173,7 @@ Through the gateway:
 
 Product catalog endpoints are available through the gateway at `/api/products`.
 Authenticated cart endpoints are available through the gateway at `/api/cart`.
+Authenticated order endpoints are available through the gateway at `/api/orders`.
 
 ## Delivery roadmap
 

@@ -87,6 +87,57 @@ services:
     ports:
       - "3003:3003"
 
+  order-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: meshly_orders
+      POSTGRES_USER: meshly
+      POSTGRES_PASSWORD: meshly_order_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - order-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meshly -d meshly_orders"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: meshly
+      RABBITMQ_DEFAULT_PASS: meshly_rabbit_password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  order-service:
+    build: ./services/order-service
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      DATABASE_URL: postgresql://meshly:meshly_order_password@order-postgres:5432/meshly_orders?schema=public
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      RABBITMQ_URL: amqp://meshly:meshly_rabbit_password@rabbitmq:5672
+      RABBITMQ_EXCHANGE: meshly.events
+      JWT_ACCESS_SECRET: change-me-access-secret
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      order-postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "3004:3004"
+
   api-gateway:
     build: ./api-gateway
     environment:
@@ -95,6 +146,7 @@ services:
       AUTH_SERVICE_URL: http://auth-service:3001
       PRODUCT_SERVICE_URL: http://product-service:3002
       CART_SERVICE_URL: http://cart-service:3003
+      ORDER_SERVICE_URL: http://order-service:3004
       JWT_ACCESS_SECRET: change-me-access-secret
       RATE_LIMIT_WINDOW_MS: 900000
       RATE_LIMIT_MAX: 100
@@ -107,3 +159,5 @@ volumes:
   postgres-data:
   mongo-data:
   redis-data:
+  order-postgres-data:
+  rabbitmq-data:
