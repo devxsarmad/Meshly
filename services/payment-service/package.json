@@ -1,0 +1,6 @@
+{
+  "name":"@meshly/payment-service","version":"1.0.0","private":true,
+  "scripts":{"dev":"tsx watch src/server.ts","build":"tsc","start":"node dist/server.js","prisma:generate":"prisma generate"},
+  "dependencies":{"@prisma/client":"^6.0.0","amqplib":"^0.10.4","dotenv":"^16.4.5","express":"^4.21.1","zod":"^3.23.8"},
+  "devDependencies":{"@types/amqplib":"^0.10.5","@types/express":"^5.0.0","@types/node":"^22.8.1","prisma":"^6.0.0","tsx":"^4.19.2","typescript":"^5.6.3"}
+}

@@ -138,6 +138,40 @@ services:
     ports:
       - "3004:3004"
 
+  payment-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: meshly_payments
+      POSTGRES_USER: meshly
+      POSTGRES_PASSWORD: meshly_payment_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - payment-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meshly -d meshly_payments"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  payment-service:
+    build: ./services/payment-service
+    environment:
+      NODE_ENV: production
+      PORT: 3005
+      DATABASE_URL: postgresql://meshly:meshly_payment_password@payment-postgres:5432/meshly_payments?schema=public
+      RABBITMQ_URL: amqp://meshly:meshly_rabbit_password@rabbitmq:5672
+      RABBITMQ_EXCHANGE: meshly.events
+      PAYMENT_QUEUE: payment-service.order-placed
+      MOCK_PAYMENT_FAILURE_RATE: 0
+    depends_on:
+      payment-postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "3005:3005"
+
   api-gateway:
     build: ./api-gateway
     environment:
@@ -161,3 +195,4 @@ volumes:
   redis-data:
   order-postgres-data:
   rabbitmq-data:
+  payment-postgres-data:

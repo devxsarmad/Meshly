@@ -1,0 +1,1 @@
+export interface OrderPlacedEvent { eventName: 'OrderPlaced'; occurredAt: string; orderId: string; userId: string; totalAmount: number; items: Array<{ productId: string; name: string; unitPrice: number; quantity: number }>; }

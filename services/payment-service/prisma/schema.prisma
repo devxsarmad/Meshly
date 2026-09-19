@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentStatus {
+  CONFIRMED
+  FAILED
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String        @unique
+  userId        String
+  amount        Decimal       @db.Decimal(12, 2)
+  status        PaymentStatus
+  failureReason String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  @@index([userId, createdAt])
+}

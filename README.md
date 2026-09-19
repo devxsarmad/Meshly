@@ -71,6 +71,12 @@ meshly/
 │   │   ├── Dockerfile
 │   │   ├── package.json
 │   │   └── .env.example
+│   ├── payment-service/
+│   │   ├── src/
+│   │   ├── prisma/
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   └── .env.example
 │   ├── product-service/
 │   ├── cart-service/
 │   ├── order-service/
