@@ -172,6 +172,20 @@ services:
     ports:
       - "3005:3005"
 
+  notification-service:
+    build: ./services/notification-service
+    environment:
+      NODE_ENV: production
+      PORT: 3006
+      RABBITMQ_URL: amqp://meshly:meshly_rabbit_password@rabbitmq:5672
+      RABBITMQ_EXCHANGE: meshly.events
+      NOTIFICATION_QUEUE: notification-service.events
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "3006:3006"
+
   api-gateway:
     build: ./api-gateway
     environment:
