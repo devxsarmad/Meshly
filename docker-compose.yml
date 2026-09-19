@@ -25,7 +25,7 @@ services:
       JWT_REFRESH_SECRET: change-me-refresh-secret
       JWT_ACCESS_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3007
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,7 +53,7 @@ services:
       PORT: 3002
       MONGODB_URI: mongodb://mongodb:27017/meshly_products
       JWT_ACCESS_SECRET: change-me-access-secret
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3007
     depends_on:
       mongodb:
         condition: service_healthy
@@ -80,7 +80,7 @@ services:
       REDIS_URL: redis://redis:6379
       CART_TTL_SECONDS: 604800
       JWT_ACCESS_SECRET: change-me-access-secret
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3007
     depends_on:
       redis:
         condition: service_healthy
@@ -94,7 +94,7 @@ services:
       POSTGRES_USER: meshly
       POSTGRES_PASSWORD: meshly_order_password
     ports:
-      - "5433:5432"
+      - "5435:5432"
     volumes:
       - order-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -129,7 +129,7 @@ services:
       RABBITMQ_URL: amqp://meshly:meshly_rabbit_password@rabbitmq:5672
       RABBITMQ_EXCHANGE: meshly.events
       JWT_ACCESS_SECRET: change-me-access-secret
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3007
     depends_on:
       order-postgres:
         condition: service_healthy

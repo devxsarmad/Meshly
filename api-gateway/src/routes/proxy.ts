@@ -3,7 +3,8 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { env } from '../config/env';
 
 export const proxyRouter = Router();
-proxyRouter.use('/auth', createProxyMiddleware({ target: env.authServiceUrl, changeOrigin: true, pathRewrite: { '^/auth': '/api/auth' } }));
-proxyRouter.use('/products', createProxyMiddleware({ target: env.productServiceUrl, changeOrigin: true, pathRewrite: { '^/products': '/api/products' } }));
-proxyRouter.use('/cart', createProxyMiddleware({ target: env.cartServiceUrl, changeOrigin: true, pathRewrite: { '^/cart': '/api/cart' } }));
-proxyRouter.use('/orders', createProxyMiddleware({ target: env.orderServiceUrl, changeOrigin: true, pathRewrite: { '^/orders': '/api/orders' } }));
+const proxyOptions = { changeOrigin: true };
+proxyRouter.use('/auth', createProxyMiddleware({ ...proxyOptions, target: env.authServiceUrl, pathRewrite: { '^/': '/api/auth/' } }));
+proxyRouter.use('/products', createProxyMiddleware({ ...proxyOptions, target: env.productServiceUrl, pathRewrite: { '^/': '/api/products/' } }));
+proxyRouter.use('/cart', createProxyMiddleware({ ...proxyOptions, target: env.cartServiceUrl, pathRewrite: { '^/': '/api/cart/' } }));
+proxyRouter.use('/orders', createProxyMiddleware({ ...proxyOptions, target: env.orderServiceUrl, pathRewrite: { '^/': '/api/orders/' } }));
