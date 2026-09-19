@@ -18,9 +18,9 @@ const config: Config = {
         error: 'var(--color-error)',
       },
       fontFamily: {
-        heading: ['var(--font-fraunces)', 'serif'],
-        body: ['var(--font-plex-sans)', 'sans-serif'],
-        mono: ['var(--font-plex-mono)', 'monospace'],
+        heading: ['"Iowan Old Style"', '"Palatino Linotype"', 'Palatino', 'serif'],
+        body: ['"IBM Plex Sans"', '"Avenir Next"', 'Arial', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'SFMono-Regular', 'Consolas', 'monospace'],
       },
       fontSize: {
         h1: ['var(--font-size-h1)', { lineHeight: 'var(--line-height-heading)', fontWeight: '600' }],
