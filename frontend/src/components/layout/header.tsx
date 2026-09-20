@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../../features/auth/auth-context';
 import { Button } from '../ui/button';
+import { MeshlyMark } from '../ui/meshly-mark';
 
 const navItem = (active: boolean) => [
   'border-b-2 py-1 transition-colors',
@@ -20,7 +21,8 @@ export function Header() {
   return (
     <header className="border-b border-border bg-background">
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-6 lg:px-8">
-        <Link href="/" className="font-heading text-h3 text-primary">
+        <Link href="/" className="flex items-center gap-2 font-heading text-h3 text-primary">
+          <MeshlyMark size="sm" />
           Meshly<span className="text-accent">.</span>
         </Link>
         <nav className="hidden items-center gap-7 text-small md:flex">

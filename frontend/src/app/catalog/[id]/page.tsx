@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
+import { MeshlyLoader } from '../../../components/ui/meshly-loader';
 import { getProduct, Product } from '../../../lib/api';
 import { addToCart } from '../../../features/cart/api';
 
@@ -26,7 +27,7 @@ export default function ProductDetailPage() {
       .finally(() => setLoading(false));
   }, [params.id]);
 
-  if (loading) return <div className="mx-auto max-w-6xl px-6 py-section text-center text-text-secondary lg:px-8">Loading product…</div>;
+  if (loading) return <div className="mx-auto max-w-6xl px-6 lg:px-8"><MeshlyLoader label="Loading product…" /></div>;
   if (error || !product) return <div className="mx-auto max-w-6xl px-6 py-section lg:px-8"><Card className="text-center"><p className="text-error">{error || 'Product not found.'}</p><Link href="/catalog"><Button className="mt-5">Back to catalog</Button></Link></Card></div>;
 
   const available = product.inventoryCount > 0;
