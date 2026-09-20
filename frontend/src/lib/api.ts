@@ -9,9 +9,6 @@ export type Product = {
   isActive: boolean;
 };
 
-type ProductResponse = { success: boolean; data: Product[] };
-type SingleProductResponse = { success: boolean; data: Product };
-
 export const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 export async function getProducts(filters?: { search?: string; category?: string }) {
@@ -29,10 +26,10 @@ export async function getProduct(id: string) {
 }
 
 export type AuthUser = { id: string; email: string; name: string | null; role: string };
-export type AuthSession = { user: AuthUser; tokens: { accessToken: string; refreshToken: string } };
+export type AuthSession = { user: AuthUser };
 
 async function authRequest(path: string, body: Record<string, string>) {
-  const response = await fetch(`${apiUrl}/api/auth/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const response = await fetch(`${apiUrl}/api/auth/${path}`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const payload = await response.json() as { success: boolean; message?: string; data?: AuthSession };
   if (!response.ok || !payload.data) throw new Error(payload.message || 'Authentication request failed.');
   return payload.data;
@@ -40,8 +37,15 @@ async function authRequest(path: string, body: Record<string, string>) {
 
 export function signIn(email: string, password: string) { return authRequest('login', { email, password }); }
 export function registerAccount(email: string, password: string, name: string) { return authRequest('register', { email, password, name }); }
-export function saveSession(session: AuthSession) { localStorage.setItem('meshly.session', JSON.stringify(session)); }
-export function getSession(): AuthSession | null { const value = localStorage.getItem('meshly.session'); return value ? JSON.parse(value) as AuthSession : null; }
-export function getAccessToken() { return getSession()?.tokens.accessToken || null; }
-export async function refreshSession() { const session = getSession(); if (!session) return null; const refreshed = await authRequest('refresh', { refreshToken: session.tokens.refreshToken }); saveSession(refreshed); return refreshed; }
-export async function signOut() { const session = getSession(); if (session) await fetch(`${apiUrl}/api/auth/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken: session.tokens.refreshToken }) }); localStorage.removeItem('meshly.session'); }
+export async function getCurrentUser() {
+  const response = await fetch(`${apiUrl}/api/auth/me`, { credentials: 'include' });
+  if (response.status === 401) {
+    await refreshSession();
+    return getCurrentUser();
+  }
+  const payload = await response.json() as { success: boolean; message?: string; data?: AuthSession };
+  if (!response.ok || !payload.data) throw new Error(payload.message || 'Authentication required.');
+  return payload.data;
+}
+export function refreshSession() { return authRequest('refresh', {}); }
+export async function signOut() { await fetch(`${apiUrl}/api/auth/logout`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }); }

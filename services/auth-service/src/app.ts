@@ -5,7 +5,7 @@ import { errorHandler } from './middlewares/error-handler';
 import { authRouter } from './routes/auth-routes';
 export const app = express();
 app.disable('x-powered-by');
-app.use(cors({ origin: env.corsOrigin }));
+app.use(cors({ origin: env.corsOrigin, credentials: true }));
 app.use(express.json());
 app.get('/health', (_request, response) => response.json({ success: true, message: 'Auth service is healthy', data: { service: 'auth-service' } }));
 app.use('/api/auth', authRouter);

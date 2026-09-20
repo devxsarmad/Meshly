@@ -26,6 +26,7 @@ services:
       JWT_ACCESS_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
       CORS_ORIGIN: http://localhost:3007
+      COOKIE_SECURE: "false"
     depends_on:
       postgres:
         condition: service_healthy
@@ -198,6 +199,7 @@ services:
   api-gateway:
     build: ./api-gateway
     environment:
+      CORS_ORIGIN: http://localhost:3007
       NODE_ENV: production
       PORT: 3000
       AUTH_SERVICE_URL: http://auth-service:3001
