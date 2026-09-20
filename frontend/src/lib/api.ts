@@ -8,16 +8,20 @@ export type Product = {
   imageUrl?: string;
   isActive: boolean;
 };
+export type Pagination = { page: number; limit: number; total: number; totalPages: number };
+export type Paginated<T> = { items: T[]; pagination: Pagination };
 
 export const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-export async function getProducts(filters?: { search?: string; category?: string }) {
+export async function getProducts(filters?: { search?: string; category?: string; page?: number; limit?: number }) {
   const params = new URLSearchParams();
   if (filters?.search) params.set('search', filters.search);
   if (filters?.category && filters.category !== 'All') params.set('category', filters.category);
+  if (filters?.page) params.set('page', String(filters.page));
+  if (filters?.limit) params.set('limit', String(filters.limit));
   const query = params.toString();
   const { apiFetch } = await import('./api-client');
-  return apiFetch<Product[]>(`/api/products${query ? `?${query}` : ''}`, { cache: 'no-store' });
+  return apiFetch<Paginated<Product>>(`/api/products${query ? `?${query}` : ''}`, { cache: 'no-store' });
 }
 
 export async function getProduct(id: string) {

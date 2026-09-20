@@ -11,6 +11,7 @@ import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
 import { Input } from '../../../components/ui/input';
 import { PasswordInput } from '../../../components/ui/password-input';
+import { notify } from '../../../lib/toast';
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'register' }) {
   const router = useRouter();
@@ -29,10 +30,13 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'register' }) {
     try {
       if (isRegister) await registerUser(values.email, values.password, values.name || '');
       else await signInUser(values.email, values.password);
+      notify('success', isRegister ? 'Account created successfully.' : 'Welcome back to Meshly.');
       const next = new URLSearchParams(window.location.search).get('next');
       router.push(next?.startsWith('/') ? next : '/catalog');
     } catch (reason) {
-      setServerError(reason instanceof Error ? reason.message : 'Unable to complete authentication.');
+      const message = reason instanceof Error ? reason.message : 'Unable to complete authentication.';
+      setServerError(message);
+      notify('error', message);
     }
   }
 

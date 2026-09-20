@@ -9,6 +9,7 @@ import { Card } from '../../../components/ui/card';
 import { MeshlyLoader } from '../../../components/ui/meshly-loader';
 import { getProduct, Product } from '../../../lib/api';
 import { addToCart } from '../../../features/cart/api';
+import { notify } from '../../../lib/toast';
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ export default function ProductDetailPage() {
     if (!params.id) return;
     getProduct(params.id)
       .then(setProduct)
-      .catch((reason: Error) => setError(reason.message))
+      .catch((reason: Error) => { setError(reason.message); notify('error', reason.message); })
       .finally(() => setLoading(false));
   }, [params.id]);
 
@@ -35,7 +36,7 @@ export default function ProductDetailPage() {
     if (!product) return;
     setAdding(true);
     setCartMessage('');
-    try { await addToCart({ productId: product._id, name: product.name, price: product.price, quantity, imageUrl: product.imageUrl }); setCartMessage('Added to your cart.'); } catch (reason) { setCartMessage(reason instanceof Error ? reason.message : 'Unable to add this item to your cart.'); } finally { setAdding(false); }
+    try { await addToCart({ productId: product._id, name: product.name, price: product.price, quantity, imageUrl: product.imageUrl }); setCartMessage('Added to your cart.'); notify('success', `${product.name} added to your cart.`); } catch (reason) { const message = reason instanceof Error ? reason.message : 'Unable to add this item to your cart.'; setCartMessage(message); notify('error', message); } finally { setAdding(false); }
   }
   return <div className="mx-auto max-w-6xl px-6 py-section lg:px-8">
     <Link href="/catalog" className="text-small text-text-secondary hover:text-primary">← Back to catalog</Link>

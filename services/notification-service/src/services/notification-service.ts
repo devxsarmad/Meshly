@@ -8,5 +8,5 @@ const addLog = (event: NotificationEvent, channel: 'email' | 'sms', message: str
 
 export const notificationService = {
   async handle(event: NotificationEvent): Promise<void> { if (event.eventName === 'OrderPlaced') { const placed = event as OrderPlacedEvent; addLog(placed, 'email', `Your Meshly order ${placed.orderId} was received.`); return; } if (event.eventName === 'PaymentConfirmed') { const confirmed = event as PaymentConfirmedEvent; addLog(confirmed, 'email', `Payment confirmed for order ${confirmed.orderId}.`); addLog(confirmed, 'sms', `Meshly payment confirmed for order ${confirmed.orderId}.`); return; } const failed = event as PaymentFailedEvent; addLog(failed, 'email', `Payment failed for order ${failed.orderId}: ${failed.failureReason}.`); },
-  list: (): NotificationLog[] => [...logs],
+  list: (page: number, limit: number) => { const ordered = [...logs].reverse(); return { items: ordered.slice((page - 1) * limit, page * limit), total: ordered.length }; },
 };

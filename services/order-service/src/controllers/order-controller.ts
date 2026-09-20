@@ -6,6 +6,7 @@ import { env } from '../config/env';
 import { AppError } from '../utils/errors';
 
 const orderSchema = z.object({ userId: z.string().optional(), items: z.array(z.object({ productId: z.string().min(1), quantity: z.number().int().positive() })).min(1) });
+const paginationSchema = z.object({ page: z.coerce.number().int().min(1).default(1), limit: z.coerce.number().int().min(1).max(50).default(10) });
 interface ProductResponse { success: boolean; data?: { name: string; price: number }; }
 const userId = (request: AuthenticatedRequest): string => request.userId as string;
 const orderId = (request: AuthenticatedRequest): string => Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
@@ -36,6 +37,6 @@ export const orderController = {
     const order = await orderService.create(userId(request), enrichedItems);
     response.status(201).json({ success: true, message: 'Order created', data: order });
   },
-  list: async (request: AuthenticatedRequest, response: Response) => response.json({ success: true, message: 'Orders retrieved', data: await orderService.listForUser(userId(request)) }),
+  list: async (request: AuthenticatedRequest, response: Response) => { const { page, limit } = paginationSchema.parse(request.query); const result = await orderService.listForUser(userId(request), page, limit); response.json({ success: true, message: 'Orders retrieved', data: { items: result.items, pagination: { page, limit, total: result.total, totalPages: Math.ceil(result.total / limit) } } }); },
   getById: async (request: AuthenticatedRequest, response: Response) => response.json({ success: true, message: 'Order retrieved', data: await orderService.getForUser(userId(request), orderId(request)) }),
 };

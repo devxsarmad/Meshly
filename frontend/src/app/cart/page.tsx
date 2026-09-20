@@ -9,6 +9,7 @@ import { MeshlyLoader } from '../../components/ui/meshly-loader';
 import { clearCart, getCart, removeFromCart, updateCartItem } from '../../features/cart/api';
 import { ProtectedRoute } from '../../features/auth/components/protected-route';
 import { CartSnapshot } from '../../features/cart/types';
+import { notify } from '../../lib/toast';
 
 const formatTtl = (seconds: number) => {
   if (seconds <= 0) return 'Cart expires when empty or inactive.';
@@ -26,7 +27,7 @@ function CartContent() {
   async function loadCart() {
     setLoading(true);
     setError('');
-    try { setSnapshot(await getCart()); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to load your cart.'); } finally { setLoading(false); }
+    try { setSnapshot(await getCart()); } catch (reason) { const message = reason instanceof Error ? reason.message : 'Unable to load your cart.'; setError(message); notify('error', message); } finally { setLoading(false); }
   }
 
   useEffect(() => { void loadCart(); }, []);
@@ -34,19 +35,19 @@ function CartContent() {
   async function changeQuantity(productId: string, quantity: number) {
     setBusyId(productId);
     setError('');
-    try { setSnapshot(await updateCartItem(productId, quantity)); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to update your cart.'); } finally { setBusyId(''); }
+    try { setSnapshot(await updateCartItem(productId, quantity)); notify('success', 'Cart quantity updated.'); } catch (reason) { const message = reason instanceof Error ? reason.message : 'Unable to update your cart.'; setError(message); notify('error', message); } finally { setBusyId(''); }
   }
 
   async function removeItem(productId: string) {
     setBusyId(productId);
     setError('');
-    try { setSnapshot(await removeFromCart(productId)); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to remove this item.'); } finally { setBusyId(''); }
+    try { setSnapshot(await removeFromCart(productId)); notify('success', 'Item removed from your cart.'); } catch (reason) { const message = reason instanceof Error ? reason.message : 'Unable to remove this item.'; setError(message); notify('error', message); } finally { setBusyId(''); }
   }
 
   async function emptyCart() {
     setBusyId('cart');
     setError('');
-    try { await clearCart(); setSnapshot((current) => current ? { ...current, cart: { ...current.cart, items: [] }, ttlSeconds: 0 } : current); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to clear your cart.'); } finally { setBusyId(''); }
+    try { await clearCart(); setSnapshot((current) => current ? { ...current, cart: { ...current.cart, items: [] }, ttlSeconds: 0 } : current); notify('success', 'Cart cleared.'); } catch (reason) { const message = reason instanceof Error ? reason.message : 'Unable to clear your cart.'; setError(message); notify('error', message); } finally { setBusyId(''); }
   }
 
   const total = useMemo(() => snapshot?.cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0, [snapshot]);
