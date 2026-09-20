@@ -19,18 +19,13 @@ export async function getProducts(filters?: { search?: string; category?: string
   if (filters?.search) params.set('search', filters.search);
   if (filters?.category && filters.category !== 'All') params.set('category', filters.category);
   const query = params.toString();
-  const response = await fetch(`${apiUrl}/api/products${query ? `?${query}` : ''}`, { cache: 'no-store' });
-  if (!response.ok) throw new Error('Unable to load the catalog right now.');
-  const payload = await response.json() as ProductResponse;
-  return payload.data;
+  const { apiFetch } = await import('./api-client');
+  return apiFetch<Product[]>(`/api/products${query ? `?${query}` : ''}`, { cache: 'no-store' });
 }
 
 export async function getProduct(id: string) {
-  const response = await fetch(`${apiUrl}/api/products/${id}`, { cache: 'no-store' });
-  if (response.status === 404) throw new Error('Product not found.');
-  if (!response.ok) throw new Error('Unable to load this product right now.');
-  const payload = await response.json() as SingleProductResponse;
-  return payload.data;
+  const { apiFetch } = await import('./api-client');
+  return apiFetch<Product>(`/api/products/${id}`, { cache: 'no-store' });
 }
 
 export type AuthUser = { id: string; email: string; name: string | null; role: string };

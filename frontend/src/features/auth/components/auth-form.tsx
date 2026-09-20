@@ -30,7 +30,8 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'register' }) {
         ? await registerAccount(values.email, values.password, values.name || '')
         : await signIn(values.email, values.password);
       saveSession(session);
-      router.push('/catalog');
+      const next = new URLSearchParams(window.location.search).get('next');
+      router.push(next?.startsWith('/') ? next : '/catalog');
     } catch (reason) {
       setServerError(reason instanceof Error ? reason.message : 'Unable to complete authentication.');
     }
