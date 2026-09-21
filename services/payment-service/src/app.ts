@@ -1,6 +1,11 @@
 import express from 'express';
 import { errorHandler } from './middlewares/error-handler';
+import { paymentController } from './controllers/payment-controller';
+import { paymentRouter } from './routes/payment-routes';
 export const app = express();
 app.disable('x-powered-by');
 app.get('/health', (_request, response) => response.json({ success: true, message: 'Payment service is healthy', data: { service: 'payment-service' } }));
+app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), paymentController.webhook);
+app.use(express.json());
+app.use('/api/payments', paymentRouter);
 app.use(errorHandler);

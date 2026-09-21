@@ -1,0 +1,3 @@
+-- Baseline for the existing payment-service database.
+-- The initial tables were created by prisma db push before migrations were introduced.
+-- This migration is intentionally empty; it is marked as applied once during setup.

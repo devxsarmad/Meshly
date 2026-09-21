@@ -13,3 +13,11 @@ export type Order = {
 export function createOrder(items: CreateOrderItem[]) {
   return apiFetch<Order>('/api/orders', { method: 'POST', body: JSON.stringify({ items }) });
 }
+
+export function getOrder(orderId: string) {
+  return apiFetch<Order>(`/api/orders/${encodeURIComponent(orderId)}`);
+}
+
+export function createPaymentIntent(orderId: string) {
+  return apiFetch<{ clientSecret: string; paymentIntentId: string; status: string }>('/api/payments/create-intent', { method: 'POST', body: JSON.stringify({ orderId }) });
+}

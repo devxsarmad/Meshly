@@ -8,3 +8,4 @@ proxyRouter.use('/auth', createProxyMiddleware({ ...proxyOptions, target: env.au
 proxyRouter.use('/products', createProxyMiddleware({ ...proxyOptions, target: env.productServiceUrl, pathRewrite: { '^/': '/api/products/' } }));
 proxyRouter.use('/cart', createProxyMiddleware({ ...proxyOptions, target: env.cartServiceUrl, pathRewrite: { '^/': '/api/cart/' } }));
 proxyRouter.use('/orders', createProxyMiddleware({ ...proxyOptions, target: env.orderServiceUrl, pathRewrite: { '^/': '/api/orders/' } }));
+proxyRouter.use('/payments', createProxyMiddleware({ ...proxyOptions, target: env.paymentServiceUrl, pathRewrite: { '^/': '/api/payments/' } }));

@@ -158,6 +158,8 @@ services:
 
   payment-service:
     build: ./services/payment-service
+    env_file:
+      - ./services/payment-service/.env
     environment:
       NODE_ENV: production
       PORT: 3005
@@ -165,7 +167,8 @@ services:
       RABBITMQ_URL: amqp://meshly:meshly_rabbit_password@rabbitmq:5672
       RABBITMQ_EXCHANGE: meshly.events
       PAYMENT_QUEUE: payment-service.order-placed
-      MOCK_PAYMENT_FAILURE_RATE: 0
+      STRIPE_CURRENCY: usd
+      JWT_ACCESS_SECRET: change-me-access-secret
     depends_on:
       payment-postgres:
         condition: service_healthy
@@ -189,9 +192,13 @@ services:
       - "3006:3006"
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-pk_test_replace_me}
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:3000
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-pk_test_replace_me}
     depends_on:
       - api-gateway
     ports:
@@ -207,11 +214,13 @@ services:
       PRODUCT_SERVICE_URL: http://product-service:3002
       CART_SERVICE_URL: http://cart-service:3003
       ORDER_SERVICE_URL: http://order-service:3004
+      PAYMENT_SERVICE_URL: http://payment-service:3005
       JWT_ACCESS_SECRET: change-me-access-secret
       RATE_LIMIT_WINDOW_MS: 900000
       RATE_LIMIT_MAX: 100
     depends_on:
       - auth-service
+      - payment-service
     ports:
       - "3000:3000"
 

@@ -13,6 +13,7 @@ export const env = {
   productServiceUrl: required('PRODUCT_SERVICE_URL', 'http://localhost:3002'),
   cartServiceUrl: required('CART_SERVICE_URL', 'http://localhost:3003'),
   orderServiceUrl: required('ORDER_SERVICE_URL', 'http://localhost:3004'),
+  paymentServiceUrl: required('PAYMENT_SERVICE_URL', 'http://localhost:3005'),
   corsOrigin: required('CORS_ORIGIN', 'http://localhost:3007'),
   jwtAccessSecret: required('JWT_ACCESS_SECRET'),
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 900000),
