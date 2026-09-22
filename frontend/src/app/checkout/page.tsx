@@ -3,6 +3,7 @@
 import { Elements } from '@stripe/react-stripe-js';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
@@ -17,6 +18,8 @@ import { formatEnumLabel } from '../../lib/formatters';
 import { notify } from '../../lib/toast';
 
 function CheckoutContent() {
+  const searchParams = useSearchParams();
+  const existingOrderId = searchParams.get('orderId');
   const [snapshot, setSnapshot] = useState<CartSnapshot | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
   const [clientSecret, setClientSecret] = useState('');
@@ -30,8 +33,18 @@ function CheckoutContent() {
   const paymentAttemptedOrderRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (existingOrderId) return;
     getCart().then(setSnapshot).catch((reason: Error) => { setError(reason.message); notify('error', reason.message); }).finally(() => setLoading(false));
-  }, []);
+  }, [existingOrderId]);
+
+  useEffect(() => {
+    if (!existingOrderId) return;
+    setLoading(true);
+    getOrder(existingOrderId).then((existingOrder) => {
+      setOrder(existingOrder);
+      void loadPaymentIntent(existingOrder.id);
+    }).catch((reason: Error) => { setError(reason.message); notify('error', reason.message); }).finally(() => setLoading(false));
+  }, [existingOrderId]);
 
   useEffect(() => {
     if (!paymentSubmitted || !order) return;

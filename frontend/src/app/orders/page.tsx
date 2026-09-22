@@ -22,6 +22,7 @@ function OrderRow({ order }: { order: Order }) {
   const itemCount = order.items.reduce((total, item) => total + item.quantity, 0);
   return (
     <Card className="p-5 sm:p-6">
+      <Link href={`/orders/${order.id}`} className="block rounded focus:outline-none focus:ring-2 focus:ring-accent">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="font-mono text-small text-text-secondary">Order {order.id}</p>
@@ -39,7 +40,7 @@ function OrderRow({ order }: { order: Order }) {
           {order.items.length > 2 && <p className="text-text-secondary">+ {order.items.length - 2} more</p>}
         </div>
         <p className="font-mono text-primary">${Number(order.totalAmount).toFixed(2)}</p>
-      </div>
+      </div></Link>
     </Card>
   );
 }

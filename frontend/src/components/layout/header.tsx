@@ -41,7 +41,8 @@ export function Header() {
                   <p className="truncate text-small text-primary">{user.name || 'Meshly customer'}</p>
                   <p className="truncate text-[11px] text-text-secondary">{user.email}</p>
                 </div>
-                <span className="block px-3 py-2 text-small text-text-secondary">Account coming soon</span>
+                <Link href="/account" className="block rounded px-3 py-2 text-small text-text-secondary hover:bg-background hover:text-primary" onClick={() => setOpen(false)}>Account</Link>
+                <Link href="/orders" className="block rounded px-3 py-2 text-small text-text-secondary hover:bg-background hover:text-primary" onClick={() => setOpen(false)}>Order history</Link>
                 <button type="button" className="block w-full rounded px-3 py-2 text-left text-small text-error transition-colors hover:bg-background" onClick={() => { setOpen(false); void signOut(); }}>Sign out</button>
               </div>}
             </div>
