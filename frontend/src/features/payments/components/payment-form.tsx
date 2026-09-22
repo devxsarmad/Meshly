@@ -16,8 +16,11 @@ export function PaymentForm({ onSubmitted }: { onSubmitted: () => void }) {
     setSubmitting(true);
     const { error: submitError } = await elements.submit();
     if (submitError) { notify('error', submitError.message || 'Please check your payment details.'); setSubmitting(false); return; }
-    const { error } = await stripe.confirmPayment({ elements, confirmParams: { return_url: `${window.location.origin}/checkout` }, redirect: 'if_required' });
+    const confirmationResult = await stripe.confirmPayment({ elements, confirmParams: { return_url: `${window.location.origin}/checkout` }, redirect: 'if_required' });
+    console.debug('[Meshly] stripe.confirmPayment result', confirmationResult);
+    const { error, paymentIntent } = confirmationResult;
     if (error) { notify('error', error.message || 'Payment could not be completed.'); setSubmitting(false); return; }
+    if (paymentIntent && paymentIntent.status !== 'succeeded') { notify('warning', `Payment is ${paymentIntent.status}. Waiting for Stripe confirmation.`); }
     notify('success', 'Payment submitted. Waiting for confirmation.');
     onSubmitted();
   }
