@@ -23,16 +23,20 @@ export const paymentService = {
     return { clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id, status: payment.status };
   },
   async handleStripeWebhook(event: Stripe.Event): Promise<void> {
-    if (event.type !== 'payment_intent.succeeded' && event.type !== 'payment_intent.payment_failed') return;
+    const supportedEvents = ['payment_intent.succeeded', 'payment_intent.payment_failed', 'payment_intent.canceled'];
+    if (!supportedEvents.includes(event.type)) {
+      console.log(`[payment-service] Ignoring unsupported Stripe event: ${event.type} (${event.id})`);
+      return;
+    }
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
     const existingEvent = await paymentRepository.findByStripeEventId(event.id);
     if (existingEvent) { console.warn(`[payment-service] Ignoring duplicate Stripe event ${event.id}`); return; }
     const payment = await paymentRepository.findByPaymentIntentId(paymentIntent.id);
     if (!payment) { console.warn(`[payment-service] Stripe event ${event.id} references unknown PaymentIntent ${paymentIntent.id}`); return; }
     if (payment.status !== PaymentStatus.PENDING) { console.warn(`[payment-service] Ignoring Stripe event ${event.id}: payment ${payment.id} is already ${payment.status}`); return; }
-    const failed = event.type === 'payment_intent.payment_failed';
-    const status = failed ? PaymentStatus.FAILED : PaymentStatus.CONFIRMED;
-    const failureReason = failed ? paymentIntent.last_payment_error?.message ?? 'Payment failed' : undefined;
+    const failed = event.type !== 'payment_intent.succeeded';
+    const status = event.type === 'payment_intent.canceled' ? PaymentStatus.CANCELED : failed ? PaymentStatus.FAILED : PaymentStatus.CONFIRMED;
+    const failureReason = failed ? paymentIntent.last_payment_error?.message ?? (event.type === 'payment_intent.canceled' ? 'Payment was canceled' : 'Payment failed') : undefined;
     const result = await paymentRepository.updateFromStripe(payment.id, status, event.id, failureReason);
     if (result.count === 0) { console.warn(`[payment-service] Skipping duplicate Stripe state transition for ${paymentIntent.id}`); return; }
     const orderId = paymentIntent.metadata.orderId || payment.orderId;

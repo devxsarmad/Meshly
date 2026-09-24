@@ -20,6 +20,11 @@ export function PaymentForm({ onSubmitted }: { onSubmitted: () => void }) {
     console.debug('[Meshly] stripe.confirmPayment result', confirmationResult);
     const { error, paymentIntent } = confirmationResult;
     if (error) { notify('error', error.message || 'Payment could not be completed.'); setSubmitting(false); return; }
+    if (paymentIntent && ['canceled', 'requires_payment_method'].includes(paymentIntent.status)) {
+      notify('error', paymentIntent.status === 'canceled' ? 'This payment was canceled. Please try again.' : 'Payment was not completed. Please check your card details.');
+      setSubmitting(false);
+      return;
+    }
     if (paymentIntent && paymentIntent.status !== 'succeeded') { notify('warning', `Payment is ${paymentIntent.status}. Waiting for Stripe confirmation.`); }
     notify('success', 'Payment submitted. Waiting for confirmation.');
     onSubmitted();

@@ -11,6 +11,7 @@ enum PaymentStatus {
   PENDING
   CONFIRMED
   FAILED
+  CANCELED
 }
 
 model Payment {
