@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronDown, ChevronUp, UserRound } from 'lucide-react';
+import { ChevronDown, ChevronUp, Menu, UserRound, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../features/auth/auth-context';
@@ -17,6 +17,7 @@ export function Header() {
   const pathname = usePathname();
   const { user, loading, signOut } = useAuth();
   const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,6 +33,10 @@ export function Header() {
       document.removeEventListener('keydown', closeOnEscape);
     };
   }, [open]);
+
+  useEffect(() => { setMobileOpen(false); setOpen(false); }, [pathname]);
+
+  const mobileNavItem = (active: boolean) => `${navItem(active)} block border-b px-1 py-3 text-base`;
 
   return (
     <header className="border-b border-border bg-background">
@@ -64,8 +69,18 @@ export function Header() {
             </div>
           ) : <Link href="/auth/sign-in"><Button size="sm" variant="secondary">Sign in</Button></Link>)}
         </nav>
-        {!loading && (user ? <button type="button" className="text-small text-primary md:hidden" onClick={() => void signOut()}>Sign out</button> : <Link href="/auth/sign-in" className="md:hidden"><Button size="sm" variant="ghost">Sign in</Button></Link>)}
+        <button type="button" className="inline-flex items-center justify-center rounded border border-transparent p-2 text-primary transition-colors hover:border-accent hover:text-accent md:hidden" onClick={() => setMobileOpen((value) => !value)} aria-expanded={mobileOpen} aria-controls="mobile-navigation" aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}>
+          {mobileOpen ? <X size={22} strokeWidth={1.8} aria-hidden="true" /> : <Menu size={22} strokeWidth={1.8} aria-hidden="true" />}
+        </button>
       </div>
+      {mobileOpen && <div id="mobile-navigation" className="border-t border-border bg-background px-6 py-4 md:hidden"><nav className="space-y-1 text-small" aria-label="Mobile navigation">
+        <Link href="/catalog" className={mobileNavItem(pathname.startsWith('/catalog'))}>Catalog</Link>
+        <Link href="/cart" className={mobileNavItem(pathname === '/cart')}>Cart</Link>
+        {user && <Link href="/orders" className={mobileNavItem(pathname.startsWith('/orders'))}>Orders</Link>}
+        <Link href="/club" className={mobileNavItem(pathname.startsWith('/club'))}>Club</Link>
+        <Link href="/about" className={mobileNavItem(pathname.startsWith('/about'))}>About</Link>
+        {!loading && (user ? <><Link href="/account" className={mobileNavItem(pathname === '/account')}>Account</Link><button type="button" className="block w-full border-b border-transparent px-1 py-3 text-left text-base text-error" onClick={() => void signOut()}>Sign out</button></> : <Link href="/auth/sign-in" className="mt-3 inline-flex"><Button size="sm" variant="secondary">Sign in</Button></Link>)}
+      </nav></div>}
     </header>
   );
 }
