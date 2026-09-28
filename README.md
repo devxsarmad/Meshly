@@ -37,6 +37,10 @@ Client → API Gateway ──REST──▶ Order Service
                     PaymentConfirmed / PaymentFailed
 ```
 
+## Meshly Club billing
+
+Meshly Club subscriptions live inside `payment-service` alongside one-time payments because both use the same Stripe credentials, webhook endpoint, persistence boundary, and billing events. This keeps the first version smaller; a separate subscription-service could later improve independent scaling and ownership at the cost of another database and more service coordination.
+
 Docker Compose provides service discovery through internal service names such as `auth-service`, `postgres`, and `rabbitmq`. Kubernetes migration is a future deployment option.
 
 ## Repository structure

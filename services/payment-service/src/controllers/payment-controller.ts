@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { env } from '../config/env';
 import { AuthenticatedRequest } from '../middlewares/auth';
 import { paymentService } from '../services/payment-service';
+import { subscriptionService } from '../services/subscription-service';
 
 const createIntentSchema = z.object({ orderId: z.string().uuid() });
 const stripe = new Stripe(env.stripeSecretKey);
@@ -29,6 +30,7 @@ export const paymentController = {
     console.log(`[payment-service] Stripe webhook signature verified: ${event.type} (${event.id})`);
     try {
       await paymentService.handleStripeWebhook(event);
+      await subscriptionService.handleWebhook(event);
       response.json({ received: true });
     } catch (error) {
       console.error('[payment-service] Stripe webhook processing failed', error);

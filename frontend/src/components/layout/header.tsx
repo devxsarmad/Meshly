@@ -29,6 +29,7 @@ export function Header() {
           <Link href="/catalog" className={navItem(pathname.startsWith('/catalog'))}>Catalog</Link>
           <Link href="/cart" className={navItem(pathname === '/cart')}>Cart</Link>
           {user && <Link href="/orders" className={navItem(pathname.startsWith('/orders'))}>Orders</Link>}
+          <Link href="/club" className={navItem(pathname.startsWith('/club'))}>Club</Link>
           <Link href="/#about" className={navItem(pathname === '/')}>About</Link>
           {!loading && (user ? (
             <div className="relative">
