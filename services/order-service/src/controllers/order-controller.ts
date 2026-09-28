@@ -8,6 +8,7 @@ import { AppError } from '../utils/errors';
 const orderSchema = z.object({ userId: z.string().optional(), items: z.array(z.object({ productId: z.string().min(1), quantity: z.number().int().positive() })).min(1) });
 const paginationSchema = z.object({ page: z.coerce.number().int().min(1).default(1), limit: z.coerce.number().int().min(1).max(50).default(10) });
 interface ProductResponse { success: boolean; data?: { name: string; price: number }; }
+interface MembershipResponse { success: boolean; data?: { status: string } | null; }
 const userId = (request: AuthenticatedRequest): string => request.userId as string;
 const orderId = (request: AuthenticatedRequest): string => Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
 
@@ -29,12 +30,24 @@ const fetchProduct = async (productId: string): Promise<{ name: string; price: n
   }
 };
 
+const fetchMembership = async (userId: string): Promise<{ status: string } | null> => {
+  try {
+    const response = await fetch(`${env.paymentServiceUrl}/internal/subscriptions/${encodeURIComponent(userId)}`, { headers: { 'x-internal-service-key': env.internalServiceKey } });
+    if (!response.ok) throw new AppError(503, 'Payment service unavailable');
+    const payload = await response.json() as MembershipResponse;
+    return payload.data ?? null;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(503, 'Payment service unavailable');
+  }
+};
+
 export const orderController = {
   create: async (request: AuthenticatedRequest, response: Response) => {
     const input = orderSchema.parse(request.body);
     // Product name/price must always be fetched from product-service, never trusted from the client, to prevent price tampering and to snapshot accurate historical order data.
     const enrichedItems = await Promise.all(input.items.map(async (item) => { const product = await fetchProduct(item.productId); return { productId: item.productId, name: product.name, unitPrice: product.price, quantity: item.quantity }; }));
-    const order = await orderService.create(userId(request), enrichedItems);
+    const order = await orderService.create(userId(request), enrichedItems, await fetchMembership(userId(request)));
     response.status(201).json({ success: true, message: 'Order created', data: order });
   },
   list: async (request: AuthenticatedRequest, response: Response) => { const { page, limit } = paginationSchema.parse(request.query); const result = await orderService.listForUser(userId(request), page, limit); response.json({ success: true, message: 'Orders retrieved', data: { items: result.items, pagination: { page, limit, total: result.total, totalPages: Math.ceil(result.total / limit) } } }); },

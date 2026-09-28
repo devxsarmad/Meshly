@@ -2,7 +2,7 @@ import { OrderStatus, PrismaClient } from '@prisma/client';
 import { OrderItemInput } from '../types/order';
 const prisma = new PrismaClient();
 export const orderRepository = {
-  create: (userId: string, items: OrderItemInput[], totalAmount: number) => prisma.order.create({ data: { userId, totalAmount, items: { create: items } }, include: { items: true } }),
+  create: (userId: string, items: OrderItemInput[], totalAmount: number, discountAmount = 0) => prisma.order.create({ data: { userId, totalAmount, discountAmount, items: { create: items } }, include: { items: true } }),
   findByUser: async (userId: string, page: number, limit: number) => {
     const where = { userId };
     const [items, total] = await Promise.all([
