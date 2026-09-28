@@ -50,6 +50,7 @@ function OrdersContent() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -59,16 +60,17 @@ function OrdersContent() {
       if (active) { setError(reason.message); notify('error', reason.message); }
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [page]);
+  }, [page, reload]);
 
   if (loading && !result) return <div className="mx-auto max-w-6xl px-6 lg:px-8"><MeshlyLoader label="Loading your orders…" /></div>;
-  if (error && !result) return <div className="mx-auto max-w-6xl px-6 py-section lg:px-8"><Card className="border-error/30 bg-error/5"><p className="text-error">{error}</p><Button className="mt-5" variant="secondary" onClick={() => setPage(1)}>Try again</Button></Card></div>;
+  if (error && !result) return <div className="mx-auto max-w-6xl px-6 py-section lg:px-8"><Card className="border-error/30 bg-error/5"><p className="text-error">{error}</p><Button className="mt-5" variant="secondary" onClick={() => setReload((current) => current + 1)}>Try again</Button></Card></div>;
 
   const orders = result?.items ?? [];
   const pagination = result?.pagination;
   return <div className="mx-auto max-w-6xl px-6 py-section lg:px-8">
     <div className="max-w-2xl"><Badge tone="accent">Your account</Badge><h1 className="mt-6 font-heading text-h1">Order history.</h1><p className="mt-5 text-body text-text-secondary">A clear record of what you bought, when it arrived, and how each payment settled.</p></div>
     {loading && <div className="mt-8"><MeshlyLoader label="Updating orders…" /></div>}
+    {error && result && <div className="mt-8 flex flex-col gap-3 rounded border border-error/30 bg-error/5 p-5 sm:flex-row sm:items-center sm:justify-between"><p className="text-small text-error">{error}</p><Button size="sm" variant="secondary" onClick={() => setReload((current) => current + 1)}>Try again</Button></div>}
     {!loading && orders.length === 0 && <Card className="mt-10 text-center"><h2 className="font-heading text-h3">No orders yet.</h2><p className="mt-3 text-text-secondary">Your completed purchases will appear here.</p><Link href="/catalog"><Button className="mt-6">Explore the catalog</Button></Link></Card>}
     {orders.length > 0 && <div className="mt-10 space-y-4">{orders.map((order) => <OrderRow key={order.id} order={order} />)}</div>}
     {pagination && pagination.totalPages > 1 && <div className="mt-10 flex items-center justify-center gap-3 border-t border-border pt-8"><Button size="sm" variant="secondary" disabled={page <= 1 || loading} onClick={() => setPage((current) => current - 1)}>Previous</Button><span className="min-w-28 text-center text-small text-text-secondary">Page {pagination.page} of {pagination.totalPages}</span><Button size="sm" variant="secondary" disabled={page >= pagination.totalPages || loading} onClick={() => setPage((current) => current + 1)}>Next</Button></div>}

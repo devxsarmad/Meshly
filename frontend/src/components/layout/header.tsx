@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ChevronDown, ChevronUp, UserRound } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../features/auth/auth-context';
 import { Button } from '../ui/button';
 import { MeshlyMark } from '../ui/meshly-mark';
@@ -17,6 +17,21 @@ export function Header() {
   const pathname = usePathname();
   const { user, loading, signOut } = useAuth();
   const [open, setOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) setOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [open]);
 
   return (
     <header className="border-b border-border bg-background">
@@ -30,9 +45,9 @@ export function Header() {
           <Link href="/cart" className={navItem(pathname === '/cart')}>Cart</Link>
           {user && <Link href="/orders" className={navItem(pathname.startsWith('/orders'))}>Orders</Link>}
           <Link href="/club" className={navItem(pathname.startsWith('/club'))}>Club</Link>
-          <Link href="/#about" className={navItem(pathname === '/')}>About</Link>
+          <Link href="/about" className={navItem(pathname.startsWith('/about'))}>About</Link>
           {!loading && (user ? (
-            <div className="relative">
+            <div ref={accountMenuRef} className="relative">
               <button type="button" className="inline-flex items-center justify-center rounded border border-transparent p-2 text-primary transition-colors hover:border-accent hover:text-accent" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label="Open account menu">
                 <UserRound size={21} strokeWidth={1.8} aria-hidden="true" />
                 {open ? <ChevronUp size={15} strokeWidth={2} aria-hidden="true" /> : <ChevronDown size={15} strokeWidth={2} aria-hidden="true" />}
