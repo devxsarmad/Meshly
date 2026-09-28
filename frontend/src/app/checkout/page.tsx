@@ -3,7 +3,7 @@
 import { Elements } from '@stripe/react-stripe-js';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
@@ -18,6 +18,7 @@ import { formatEnumLabel } from '../../lib/formatters';
 import { notify } from '../../lib/toast';
 
 function CheckoutContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const existingOrderId = searchParams.get('orderId');
   const [snapshot, setSnapshot] = useState<CartSnapshot | null>(null);
@@ -55,7 +56,7 @@ function CheckoutContent() {
         const updated = await getOrder(order.id);
         if (!active) return;
         setOrder(updated);
-        if (updated.status === 'CONFIRMED') { notify('success', 'Payment confirmed. Your order is confirmed.'); setPaymentSubmitted(false); return; }
+        if (updated.status === 'CONFIRMED') { notify('success', 'Payment confirmed. Your order is confirmed.'); setPaymentSubmitted(false); router.replace(`/orders/${updated.id}/confirmation`); return; }
         if (updated.status === 'PAYMENT_FAILED') { notify('error', 'Payment failed. Please try again with another payment method.'); setPaymentSubmitted(false); return; }
         timer = setTimeout(() => void poll(), 2000);
       } catch (reason) {
@@ -64,7 +65,7 @@ function CheckoutContent() {
     };
     void poll();
     return () => { active = false; if (timer) clearTimeout(timer); };
-  }, [order?.id, paymentSubmitted]);
+  }, [order?.id, paymentSubmitted, router]);
 
   const items = snapshot?.cart.items || [];
   const total = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
