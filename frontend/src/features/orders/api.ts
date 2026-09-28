@@ -5,6 +5,7 @@ export type Order = {
   id: string;
   userId: string;
   totalAmount: number | string;
+  discountAmount: number | string;
   status: string;
   createdAt: string;
   items: Array<{ productId: string; name: string; unitPrice: number | string; quantity: number }>;

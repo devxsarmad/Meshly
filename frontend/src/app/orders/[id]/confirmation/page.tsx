@@ -37,6 +37,7 @@ function ConfirmationContent() {
       <p className="mt-5 text-body text-text-secondary">{confirmed ? 'Your order has been received and your payment has been confirmed.' : failed ? 'Your order was created, but the payment did not complete.' : 'Your order was created and is waiting for payment confirmation.'}</p>
       <div className="mt-8 border-y border-border py-5 text-small">
         <div className="flex justify-between gap-4"><span className="text-text-secondary">Order number</span><span className="font-mono text-primary">{order.id}</span></div>
+        {Number(order.discountAmount) > 0 && <div className="mt-3 flex justify-between"><span className="text-text-secondary">Meshly Club discount</span><span className="font-mono text-success">-${Number(order.discountAmount).toFixed(2)}</span></div>}
         <div className="mt-3 flex justify-between"><span className="text-text-secondary">Total</span><span className="font-mono text-primary">${Number(order.totalAmount).toFixed(2)}</span></div>
       </div>
       <div className="mt-8 flex flex-wrap justify-center gap-3"><Link href={`/orders/${order.id}`}><Button>{failed ? 'Try payment again' : 'View order details'}</Button></Link><Link href="/catalog"><Button variant="secondary">Continue shopping</Button></Link></div>

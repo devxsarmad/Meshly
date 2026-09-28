@@ -11,4 +11,5 @@ export const subscriptionController = {
   checkout: async (request: AuthenticatedRequest, response: Response) => { const { planId } = checkoutSchema.parse(request.body); response.status(201).json({ success: true, message: 'Subscription checkout created', data: await subscriptionService.createCheckout(userId(request), planId) }); },
   me: async (request: AuthenticatedRequest, response: Response) => response.json({ success: true, message: 'Membership retrieved', data: await subscriptionService.getCurrent(userId(request)) }),
   portal: async (request: AuthenticatedRequest, response: Response) => response.json({ success: true, message: 'Billing portal created', data: await subscriptionService.createPortal(userId(request)) }),
+  internalMembership: async (request: AuthenticatedRequest, response: Response) => { const requestedUserId = Array.isArray(request.params.userId) ? request.params.userId[0] : request.params.userId; response.json({ success: true, message: 'Internal membership status retrieved', data: await subscriptionService.getCurrent(requestedUserId) }); },
 };

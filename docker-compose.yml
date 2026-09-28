@@ -127,6 +127,8 @@ services:
       PORT: 3004
       DATABASE_URL: postgresql://meshly:meshly_order_password@order-postgres:5432/meshly_orders?schema=public
       PRODUCT_SERVICE_URL: http://product-service:3002
+      PAYMENT_SERVICE_URL: http://payment-service:3005
+      INTERNAL_SERVICE_KEY: meshly-internal-dev-key
       RABBITMQ_URL: amqp://meshly:meshly_rabbit_password@rabbitmq:5672
       RABBITMQ_EXCHANGE: meshly.events
       ORDER_PAYMENT_QUEUE: order-service.payment-events
@@ -169,6 +171,7 @@ services:
       PAYMENT_QUEUE: payment-service.order-placed
       STRIPE_CURRENCY: usd
       JWT_ACCESS_SECRET: change-me-access-secret
+      INTERNAL_SERVICE_KEY: meshly-internal-dev-key
       FRONTEND_URL: http://localhost:3007
       CLUB_SUCCESS_URL: http://localhost:3007/club/success
       CLUB_CANCEL_URL: http://localhost:3007/club/cancelled
