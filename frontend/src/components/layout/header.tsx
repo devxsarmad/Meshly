@@ -47,10 +47,12 @@ export function Header() {
         </Link>
         <nav className="hidden items-center gap-7 text-small md:flex">
           <Link href="/catalog" className={navItem(pathname.startsWith('/catalog'))}>Catalog</Link>
-          <Link href="/cart" className={navItem(pathname === '/cart')}>Cart</Link>
-          {user && <Link href="/orders" className={navItem(pathname.startsWith('/orders'))}>Orders</Link>}
-          <Link href="/club" className={navItem(pathname.startsWith('/club'))}>Club</Link>
-          {user && <Link href="/wishlist" className={navItem(pathname.startsWith('/wishlist'))}>Wishlist</Link>}
+          {user && <>
+            <Link href="/cart" className={navItem(pathname === '/cart')}>Cart</Link>
+            <Link href="/orders" className={navItem(pathname.startsWith('/orders'))}>Orders</Link>
+            <Link href="/club" className={navItem(pathname.startsWith('/club'))}>Club</Link>
+            <Link href="/wishlist" className={navItem(pathname.startsWith('/wishlist'))}>Wishlist</Link>
+          </>}
           <Link href="/about" className={navItem(pathname.startsWith('/about'))}>About</Link>
           {!loading && (user ? (
             <div ref={accountMenuRef} className="relative">
@@ -76,10 +78,12 @@ export function Header() {
       </div>
       {mobileOpen && <div id="mobile-navigation" className="border-t border-border bg-background px-6 py-4 md:hidden"><nav className="space-y-1 text-small" aria-label="Mobile navigation">
         <Link href="/catalog" className={mobileNavItem(pathname.startsWith('/catalog'))}>Catalog</Link>
-        <Link href="/cart" className={mobileNavItem(pathname === '/cart')}>Cart</Link>
-        {user && <Link href="/orders" className={mobileNavItem(pathname.startsWith('/orders'))}>Orders</Link>}
-        <Link href="/club" className={mobileNavItem(pathname.startsWith('/club'))}>Club</Link>
-        {user && <Link href="/wishlist" className={mobileNavItem(pathname.startsWith('/wishlist'))}>Wishlist</Link>}
+        {user && <>
+          <Link href="/cart" className={mobileNavItem(pathname === '/cart')}>Cart</Link>
+          <Link href="/orders" className={mobileNavItem(pathname.startsWith('/orders'))}>Orders</Link>
+          <Link href="/club" className={mobileNavItem(pathname.startsWith('/club'))}>Club</Link>
+          <Link href="/wishlist" className={mobileNavItem(pathname.startsWith('/wishlist'))}>Wishlist</Link>
+        </>}
         <Link href="/about" className={mobileNavItem(pathname.startsWith('/about'))}>About</Link>
         {!loading && (user ? <><Link href="/account" className={mobileNavItem(pathname === '/account')}>Account</Link><button type="button" className="block w-full border-b border-transparent px-1 py-3 text-left text-base text-error" onClick={() => void signOut()}>Sign out</button></> : <Link href="/auth/sign-in" className="mt-3 inline-flex"><Button size="sm" variant="secondary">Sign in</Button></Link>)}
       </nav></div>}
