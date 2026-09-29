@@ -9,6 +9,9 @@ import { MeshlyLoader } from '../../components/ui/meshly-loader';
 import { Input } from '../../components/ui/input';
 import { getProducts, Product } from '../../lib/api';
 import { notify } from '../../lib/toast';
+import { useAuth } from '../../features/auth/auth-context';
+import { getWishlist } from '../../features/wishlist/api';
+import { WishlistButton } from '../../features/wishlist/components/wishlist-button';
 
 const categories = ['All', 'Home', 'Workspace', 'Kitchen', 'Travel'];
 
@@ -22,6 +25,10 @@ export default function CatalogPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [retryKey, setRetryKey] = useState(0);
+  const { user } = useAuth();
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+
+  useEffect(() => { if (!user) { setSavedIds([]); return; } getWishlist().then((items) => setSavedIds(items.map((item) => item.productId))).catch(() => undefined); }, [user]);
 
   useEffect(() => {
     let active = true;
@@ -49,6 +56,6 @@ export default function CatalogPage() {
     {loading && <MeshlyLoader label="Loading the collection…" />}
     {!loading && error && <Card className="mt-10 border-error/30 bg-error/5 text-center"><p className="text-error">{error}</p><Button className="mt-5" onClick={() => setRetryKey((value) => value + 1)}>Try again</Button></Card>}
     {!loading && !error && products.length === 0 && <p className="py-16 text-center text-text-secondary">No products match this collection yet.</p>}
-    {!loading && !error && products.length > 0 && <><div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{products.map((product) => <Link href={`/catalog/${product._id}`} key={product._id}><Card className="h-full overflow-hidden p-0 transition-shadow hover:shadow-md"><div className="flex aspect-[4/3] items-center justify-center bg-primary/5">{product.imageUrl ? <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" /> : <span className="font-mono text-small uppercase tracking-[0.12em] text-text-secondary">Meshly / {product.category}</span>}</div><div className="p-6"><p className="font-mono text-small uppercase tracking-[0.1em] text-accent">{product.category}</p><h2 className="mt-3 font-heading text-h4 text-text-primary">{product.name}</h2><p className="mt-3 line-clamp-2 text-small text-text-secondary">{product.description}</p><div className="mt-5 flex items-center justify-between"><span className="font-mono text-small text-primary">${product.price.toFixed(2)}</span><span className="text-small text-text-secondary">{product.inventoryCount > 0 ? 'In stock' : 'Sold out'}</span></div></div></Card></Link>)}</div><div className="mt-10 flex items-center justify-center gap-3 border-t border-border pt-5"><Button variant="secondary" size="sm" className="rounded-full px-5" disabled={page === 1 || loading} onClick={() => setPage((value) => value - 1)}>Previous</Button><span className="min-w-24 text-center text-small text-text-secondary">Page {page} of {totalPages}</span><Button variant="secondary" size="sm" className="rounded-full px-5" disabled={page >= totalPages || loading} onClick={() => setPage((value) => value + 1)}>Next</Button></div></>}
+    {!loading && !error && products.length > 0 && <><div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{products.map((product) => <Card key={product._id} className="h-full overflow-hidden p-0 transition-shadow hover:shadow-md"><Link href={`/catalog/${product._id}`}><div className="flex aspect-[4/3] items-center justify-center bg-primary/5">{product.imageUrl ? <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" /> : <span className="font-mono text-small uppercase tracking-[0.12em] text-text-secondary">Meshly / {product.category}</span>}</div></Link><div className="p-6"><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-small uppercase tracking-[0.1em] text-accent">{product.category}</p><Link href={`/catalog/${product._id}`}><h2 className="mt-3 font-heading text-h4 text-text-primary">{product.name}</h2></Link></div><WishlistButton item={{ productId: product._id, name: product.name, price: product.price, imageUrl: product.imageUrl }} saved={savedIds.includes(product._id)} onChange={(saved) => setSavedIds((current) => saved ? [...current, product._id] : current.filter((id) => id !== product._id))} /></div><p className="mt-3 line-clamp-2 text-small text-text-secondary">{product.description}</p><div className="mt-5 flex items-center justify-between"><span className="font-mono text-small text-primary">${product.price.toFixed(2)}</span><span className="text-small text-text-secondary">{product.inventoryCount > 0 ? 'In stock' : 'Sold out'}</span></div></div></Card>)}</div><div className="mt-10 flex items-center justify-center gap-3 border-t border-border pt-5"><Button variant="secondary" size="sm" className="rounded-full px-5" disabled={page === 1 || loading} onClick={() => setPage((value) => value - 1)}>Previous</Button><span className="min-w-24 text-center text-small text-text-secondary">Page {page} of {totalPages}</span><Button variant="secondary" size="sm" className="rounded-full px-5" disabled={page >= totalPages || loading} onClick={() => setPage((value) => value + 1)}>Next</Button></div></>}
   </div>;
 }
