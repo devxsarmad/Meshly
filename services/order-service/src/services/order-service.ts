@@ -3,9 +3,10 @@ import { orderRepository } from '../repositories/order-repository';
 import { OrderItemInput } from '../types/order';
 import { publishOrderPlaced } from '../events/order-events';
 import { AppError } from '../utils/errors';
+import { calculateOrderTotal } from './order-calculation';
 
 export const orderService = {
-  async create(userId: string, items: OrderItemInput[], membership: { status: string } | null) { const subtotal = items.reduce((total, item) => total + item.unitPrice * item.quantity, 0); const clubDiscount = membership?.status === 'ACTIVE' ? Math.round(subtotal * 0.1 * 100) / 100 : 0; const totalAmount = Math.max(0, subtotal - clubDiscount); const order = await orderRepository.create(userId, items, totalAmount, clubDiscount); await publishOrderPlaced({ eventName: 'OrderPlaced', occurredAt: new Date().toISOString(), orderId: order.id, userId: order.userId, totalAmount: Number(order.totalAmount), items: order?.items?.map((item) => ({ productId: item.productId, name: item.name, unitPrice: Number(item.unitPrice), quantity: item.quantity })), clubDiscount }); return order; },
+  async create(userId: string, items: OrderItemInput[], membership: { status: string } | null) { const { clubDiscount, totalAmount } = calculateOrderTotal(items, membership); const order = await orderRepository.create(userId, items, totalAmount, clubDiscount); await publishOrderPlaced({ eventName: 'OrderPlaced', occurredAt: new Date().toISOString(), orderId: order.id, userId: order.userId, totalAmount: Number(order.totalAmount), items: order?.items?.map((item) => ({ productId: item.productId, name: item.name, unitPrice: Number(item.unitPrice), quantity: item.quantity })), clubDiscount }); return order; },
   listForUser: (userId: string, page: number, limit: number) => orderRepository.findByUser(userId, page, limit),
   async getForUser(userId: string, orderId: string) { const order = await orderRepository.findById(orderId); if (!order || order.userId !== userId) throw new AppError(404, 'Order not found'); return order; },
   async handlePaymentEvent(event: { eventName: 'PaymentConfirmed' | 'PaymentFailed'; orderId: string }): Promise<void> {

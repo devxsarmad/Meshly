@@ -10,6 +10,10 @@ export const connectEventBus = async (): Promise<void> => {
   await channel.assertQueue(env.orderPaymentQueue, { durable: true });
   for (const routingKey of ['payment.confirmed', 'payment.failed']) await channel.bindQueue(env.orderPaymentQueue, env.rabbitmqExchange, routingKey);
 };
+export const checkEventBus = async (): Promise<void> => {
+  if (!channel) throw new Error('RabbitMQ channel is not connected');
+  await channel.checkQueue(env.orderPaymentQueue);
+};
 export const publishOrderPlaced = async (payload: Record<string, unknown>): Promise<void> => { if (!channel) throw new Error('RabbitMQ channel is not connected'); channel.publish(env.rabbitmqExchange, 'order.placed', Buffer.from(JSON.stringify(payload)), { persistent: true, contentType: 'application/json' }); };
 export const consumePaymentEvents = async (handler: (payload: unknown) => Promise<void>): Promise<void> => {
   await channel.consume(env.orderPaymentQueue, async (message) => {

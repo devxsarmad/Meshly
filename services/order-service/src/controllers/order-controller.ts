@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from '../middlewares/auth';
 import { orderService } from '../services/order-service';
 import { env } from '../config/env';
 import { AppError } from '../utils/errors';
+import { enrichOrderItems } from '../services/order-calculation';
 
 const orderSchema = z.object({ userId: z.string().optional(), items: z.array(z.object({ productId: z.string().min(1), quantity: z.number().int().positive() })).min(1) });
 const paginationSchema = z.object({ page: z.coerce.number().int().min(1).default(1), limit: z.coerce.number().int().min(1).max(50).default(10) });
@@ -46,7 +47,7 @@ export const orderController = {
   create: async (request: AuthenticatedRequest, response: Response) => {
     const input = orderSchema.parse(request.body);
     // Product name/price must always be fetched from product-service, never trusted from the client, to prevent price tampering and to snapshot accurate historical order data.
-    const enrichedItems = await Promise.all(input.items.map(async (item) => { const product = await fetchProduct(item.productId); return { productId: item.productId, name: product.name, unitPrice: product.price, quantity: item.quantity }; }));
+    const enrichedItems = await enrichOrderItems(input.items, fetchProduct);
     const order = await orderService.create(userId(request), enrichedItems, await fetchMembership(userId(request)));
     response.status(201).json({ success: true, message: 'Order created', data: order });
   },

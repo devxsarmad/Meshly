@@ -8,13 +8,12 @@ import { Card } from "../../components/ui/card";
 import { MeshlyLoader } from "../../components/ui/meshly-loader";
 import { ProtectedRoute } from "../../features/auth/components/protected-route";
 import { addToCart } from "../../features/cart/api";
+import { ProductCard } from "../../features/catalog/components/product-card";
 import {
   getWishlist,
   removeFromWishlist,
   type WishlistItem,
 } from "../../features/wishlist/api";
-import { WishlistButton } from "../../features/wishlist/components/wishlist-button";
-import { ProductImage } from "../../components/ui/product-image";
 import { notify } from "../../lib/toast";
 
 function WishlistContent() {
@@ -92,39 +91,7 @@ function WishlistContent() {
       )}
       {!loading && !error && items.length > 0 && (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <Card key={item.productId} className="flex flex-col p-0">
-              <div className="relative">
-                <Link href={`/catalog/${item.productId}`} className="block">
-                  <div className="flex aspect-[4/3] items-center justify-center rounded-t bg-primary/5">
-                    <ProductImage src={item.imageUrl} alt={item.name} className="rounded-t" />
-                  </div>
-                </Link>
-                <WishlistButton item={item} saved onChange={(saved) => { if (!saved) setItems((current) => current.filter((savedItem) => savedItem.productId !== item.productId)); }} className="absolute right-3 top-3 z-10 bg-surface/95" />
-              </div>
-              <div className="flex flex-1 flex-col p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <Link href={`/catalog/${item.productId}`}>
-                      <h2 className="font-heading text-h4 text-text-primary">
-                        {item.name}
-                      </h2>
-                    </Link>
-                    <p className="mt-2 font-mono text-small text-primary">
-                      ${item.price.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  className="mt-6 w-full"
-                  disabled={busyId === item.productId}
-                  onClick={() => void moveToCart(item)}
-                >
-                  {busyId === item.productId ? "Adding…" : "Add to cart"}
-                </Button>
-              </div>
-            </Card>
-          ))}
+          {items.map((item) => <ProductCard key={item.productId} product={{ id: item.productId, name: item.name, price: item.price, imageUrl: item.imageUrl }} saved showCategory={false} showDescription={false} showStock={false} showAddToCart addToCartBusy={busyId === item.productId} onAddToCart={() => void moveToCart(item)} onWishlistChange={(saved) => { if (!saved) setItems((current) => current.filter((savedItem) => savedItem.productId !== item.productId)); }} />)}
         </div>
       )}
     </div>

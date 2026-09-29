@@ -5,6 +5,7 @@ import { publishPaymentEvent } from '../events/payment-events';
 import { OrderPlacedEvent } from '../types/events';
 import { env } from '../config/env';
 import { AppError } from '../utils/errors';
+import { paymentStatusForStripeEvent, shouldProcessPaymentEvent } from '../utils/payment-event-policy';
 
 const stripe = new Stripe(env.stripeSecretKey);
 
@@ -33,9 +34,9 @@ export const paymentService = {
     if (existingEvent) { console.warn(`[payment-service] Ignoring duplicate Stripe event ${event.id}`); return; }
     const payment = await paymentRepository.findByPaymentIntentId(paymentIntent.id);
     if (!payment) { console.warn(`[payment-service] Stripe event ${event.id} references unknown PaymentIntent ${paymentIntent.id}`); return; }
-    if (payment.status !== PaymentStatus.PENDING) { console.warn(`[payment-service] Ignoring Stripe event ${event.id}: payment ${payment.id} is already ${payment.status}`); return; }
+    if (!shouldProcessPaymentEvent(payment.status)) { console.warn(`[payment-service] Ignoring Stripe event ${event.id}: payment ${payment.id} is already ${payment.status}`); return; }
     const failed = event.type !== 'payment_intent.succeeded';
-    const status = event.type === 'payment_intent.canceled' ? PaymentStatus.CANCELED : failed ? PaymentStatus.FAILED : PaymentStatus.CONFIRMED;
+    const status = paymentStatusForStripeEvent(event.type);
     const failureReason = failed ? paymentIntent.last_payment_error?.message ?? (event.type === 'payment_intent.canceled' ? 'Payment was canceled' : 'Payment failed') : undefined;
     const result = await paymentRepository.updateFromStripe(payment.id, status, event.id, failureReason);
     if (result.count === 0) { console.warn(`[payment-service] Skipping duplicate Stripe state transition for ${paymentIntent.id}`); return; }

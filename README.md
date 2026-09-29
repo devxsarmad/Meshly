@@ -154,6 +154,34 @@ Stop the environment with:
 docker compose down
 ```
 
+### Health checks
+
+Each backend service exposes `GET /health`. A healthy response is `200` with dependency details; a failed database, Redis, or RabbitMQ check returns `503`. The gateway has a process health check because it does not own a datastore.
+
+```bash
+curl http://localhost:3000/health   # API gateway
+curl http://localhost:3001/health   # auth-service
+curl http://localhost:3002/health   # product-service
+curl http://localhost:3003/health   # cart-service
+curl http://localhost:3004/health   # order-service
+curl http://localhost:3005/health   # payment-service
+curl http://localhost:3006/health   # notification-service
+```
+
+The gateway does not currently proxy service health endpoints, so the direct service ports above are intended for local diagnostics.
+
+### Focused tests
+
+The backend test suites use Node's built-in test runner through `tsx`. They cover the highest-risk examples without pretending to provide full system coverage:
+
+```bash
+for service in auth-service cart-service notification-service order-service payment-service product-service; do
+  (cd services/$service && npm test)
+done
+```
+
+The tests exercise login credential validation, server-side product enrichment and Club discount calculation during order creation, Stripe payment-event idempotency policy, Redis key separation, notification event bindings, and pagination boundaries.
+
 ### Running a service independently
 
 Each service can be copied out of this repository and installed independently. For example:
@@ -206,4 +234,16 @@ The platform is developed incrementally so every architectural slice remains run
 10. Optional Kubernetes deployment.
 
 The repository intentionally grows one independently verifiable service at a time while preserving the final architecture above.
+
+## Known Limitations / Future Improvements
+
+- There is no monitoring dashboard, centralized metrics, distributed tracing, or alerting yet.
+- Test coverage is intentionally limited to focused unit-level examples; full API, contract, browser, and end-to-end suites are still needed.
+- There is no CI/CD pipeline that automatically runs builds, tests, security scans, or deployments.
+- Docker Compose is suitable for local development and a basic single-host demonstration, not high availability or production orchestration.
+- Secrets are environment-based for local development; production should use a managed secret store and rotated credentials.
+- Stripe webhook processing and RabbitMQ consumers need stronger operational tooling such as retry policies, dead-letter queues, and replay procedures.
+- Product images currently depend on external image URLs and use a frontend fallback when an image is unavailable.
+- Inventory reservation, shipping fulfillment, refunds, member discounts at checkout, and an admin product-management surface remain future work.
+- Kubernetes manifests, autoscaling, rolling deployments, and managed database migration strategy have not been implemented.
 # Meshly
