@@ -35,7 +35,7 @@ export function ProductCard({ product, saved = false, onWishlistChange, showCate
       <div className="relative">
         <Link href={`/catalog/${product.id}`} className="block">
           <div className="flex aspect-[4/3] items-center justify-center bg-primary/5">
-            <ProductImage src={product.imageUrl} alt={product.name} />
+            <ProductImage src={product.imageUrl} alt={product.name} zoomOnHover />
           </div>
         </Link>
         <WishlistButton
