@@ -40,17 +40,34 @@ export default function AboutPage() {
           </dl>
         </div>
 
-        <Card className="relative overflow-hidden !bg-primary text-center">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/20" />
-          <div className="relative flex min-h-64 flex-col items-center justify-center gap-4">
-            <span className="font-mono text-small uppercase tracking-wide text-white/60">
-              Our approach
-            </span>
-            <p className="max-w-sm font-heading text-h2 text-white">
-              Thoughtful objects, chosen with purpose.
-            </p>
-          </div>
-        </Card>
+       <Card className="relative overflow-hidden border-none text-center">
+  {/* base: diagonal navy-to-terracotta gradient */}
+  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-accent" />
+
+  {/* warm glow pooling toward the accent corner */}
+  <div className="pointer-events-none absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-accent-hover/50 blur-3xl" />
+
+  {/* cool counter-glow, opposite corner */}
+  <div className="pointer-events-none absolute -left-16 -top-20 h-64 w-64 rounded-full bg-primary-hover/60 blur-3xl" />
+
+  {/* fine dot-grid texture */}
+  <div
+    className="pointer-events-none absolute inset-0 opacity-[0.08]"
+    style={{
+      backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+      backgroundSize: '18px 18px',
+    }}
+  />
+
+  <div className="relative flex min-h-64 flex-col items-center justify-center gap-4 px-6">
+    <span className="font-mono text-small uppercase tracking-wide text-white/70">
+      Our approach
+    </span>
+    <p className="max-w-sm font-heading text-h2 text-white drop-shadow-sm">
+      Thoughtful objects, chosen with purpose.
+    </p>
+  </div>
+</Card>
       </section>
 
       <section className="grid gap-6 border-t border-border pt-section md:grid-cols-3">
