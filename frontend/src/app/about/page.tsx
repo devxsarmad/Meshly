@@ -40,19 +40,17 @@ export default function AboutPage() {
           </dl>
         </div>
 
-       <Card className="relative overflow-hidden border-none text-center">
-  {/* base: diagonal navy-to-terracotta gradient */}
-  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-accent" />
+<Card className="relative overflow-hidden border-none text-center">
+  {/* base: navy to accent diagonal gradient */}
+<div className="absolute inset-0 bg-gradient-to-br from-[#2C4356] via-[#2C4356] to-[#C65D3B]" />
+  {/* animated orange smoke, concentrated in the accent corner */}
+  <div className="pointer-events-none absolute -bottom-20 -right-16 h-96 w-96 rounded-full bg-accent-hover blur-[80px] [animation:smoke-drift-a_12s_ease-in-out_infinite]" />
+  <div className="pointer-events-none absolute -bottom-10 right-10 h-72 w-72 rounded-full bg-accent/80 blur-[90px] [animation:smoke-drift-b_16s_ease-in-out_infinite]" />
+  <div className="pointer-events-none absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-accent-hover/70 blur-[70px] [animation:smoke-drift-a_20s_ease-in-out_infinite_reverse]" />
 
-  {/* warm glow pooling toward the accent corner */}
-  <div className="pointer-events-none absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-accent-hover/50 blur-3xl" />
-
-  {/* cool counter-glow, opposite corner */}
-  <div className="pointer-events-none absolute -left-16 -top-20 h-64 w-64 rounded-full bg-primary-hover/60 blur-3xl" />
-
-  {/* fine dot-grid texture */}
+  {/* fine grain texture */}
   <div
-    className="pointer-events-none absolute inset-0 opacity-[0.08]"
+    className="pointer-events-none absolute inset-0 opacity-[0.06]"
     style={{
       backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
       backgroundSize: '18px 18px',
