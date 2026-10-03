@@ -4,6 +4,7 @@ import { requireAdmin, requireAuth } from '../middlewares/auth';
 
 export const productRouter = Router();
 productRouter.get('/', productController.list);
+productRouter.get('/categories', productController.listCategories);
 productRouter.get('/:id/reviews', productController.listReviews);
 productRouter.post('/:id/reviews', requireAuth, productController.upsertReview);
 productRouter.get('/:id', productController.getById);

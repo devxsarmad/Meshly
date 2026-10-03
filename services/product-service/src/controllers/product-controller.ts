@@ -12,6 +12,7 @@ const routeId = (request: Request): string => Array.isArray(request.params.id) ?
 const reviewSchema = z.object({ rating: z.number().int().min(1).max(5), comment: z.string().trim().min(2).max(1000) });
 
 export const productController = {
+  listCategories: async (_request: Request, response: Response) => response.json({ success: true, message: 'Categories retrieved', data: await productService.listCategories() }),
   list: async (request: Request, response: Response) => { const { page, limit } = paginationSchema.parse(request.query); const result = await productService.list({ page, limit, search: typeof request.query.search === 'string' ? request.query.search : undefined, category: typeof request.query.category === 'string' ? request.query.category : undefined, activeOnly: request.query.includeInactive !== 'true' }); response.json({ success: true, message: 'Products retrieved', data: { items: result.items, pagination: { page, limit, total: result.total, totalPages: totalPages(result.total, limit) } } }); },
   getById: async (request: Request, response: Response) => { const id = routeId(request); const [product, reviewStats] = await Promise.all([productService.getById(id), reviewService.stats(id)]); response.json({ success: true, message: 'Product retrieved', data: { ...product, ...reviewStats } }); },
   listReviews: async (request: Request, response: Response) => { const id = routeId(request); await productService.getById(id); response.json({ success: true, message: 'Reviews retrieved', data: await reviewService.list(id) }); },

@@ -4,6 +4,7 @@ import { ProductDocument, ProductModel } from '../models/product-model';
 export interface ProductFilters { search?: string; category?: string; activeOnly?: boolean; page: number; limit: number; }
 
 export const productRepository = {
+  listCategories: () => ProductModel.distinct('category', { isActive: true }).then((categories) => categories.sort((a, b) => a.localeCompare(b))),
   list: async (filters: ProductFilters) => {
     const query: FilterQuery<ProductDocument> = {};
     if (filters.activeOnly) query.isActive = true;
