@@ -1,7 +1,7 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000
 COPY prisma ./prisma
 RUN npx prisma generate
 COPY tsconfig.json ./
@@ -11,10 +11,11 @@ RUN npm run build
 FROM node:22-alpine
 WORKDIR /app
 COPY --from=build /app/package*.json ./
-RUN npm install --omit=dev
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --no-audit --no-fund --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/dist ./dist
+COPY --chown=node:node --from=build /app/prisma ./prisma
+COPY --chown=node:node --from=build /app/dist ./dist
+USER node
 EXPOSE 3004
-CMD ["sh", "-c", "npx prisma db push && npm start"]
+CMD ["sh", "-c", "npx prisma db push --skip-generate && npm start"]

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const { ProductModel } = require('../dist/models/product-model.js');
 
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/meshly_products';
+const mongoUri = process.env.MONGODB_URI;
+if (!mongoUri) throw new Error('MONGODB_URI is required');
 const image = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=80`;
 
 const baseProducts = [

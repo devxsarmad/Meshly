@@ -11,5 +11,5 @@ export const env = {
   redisUrl: required('REDIS_URL'),
   cartTtlSeconds: Number(process.env.CART_TTL_SECONDS ?? 604800),
   jwtAccessSecret: required('JWT_ACCESS_SECRET'),
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+  corsOrigin: required('CORS_ORIGIN'),
 };

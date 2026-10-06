@@ -13,7 +13,9 @@ export type Product = {
 export type Pagination = { page: number; limit: number; total: number; totalPages: number };
 export type Paginated<T> = { items: T[]; pagination: Pagination };
 
-export const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL;
+if (!configuredApiUrl) throw new Error('NEXT_PUBLIC_API_URL is required');
+export const apiUrl = configuredApiUrl.replace(/\/$/, '');
 
 export async function getProducts(filters?: { search?: string; category?: string; page?: number; limit?: number }) {
   const params = new URLSearchParams();
