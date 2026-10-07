@@ -5,6 +5,41 @@ x-service-defaults: &service-defaults
   networks: [meshly]
 
 services:
+  nginx:
+    image: nginx:1.27.2-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env.prod}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - letsencrypt-data:/etc/letsencrypt:ro
+    depends_on:
+      - frontend
+      - api-gateway
+      - payment-service
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-check-certificate -qO- https://localhost/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    mem_limit: 64m
+    networks: [meshly]
+
+  # Standalone issuance is deliberately profile-gated: on a single-domain VPS it
+  # avoids a permanently running Certbot sidecar and keeps certificate ownership simple.
+  certbot:
+    image: certbot/certbot:v2.11.0
+    profiles: [certificate]
+    ports:
+      - "80:80"
+    volumes:
+      - letsencrypt-data:/etc/letsencrypt
+    mem_limit: 64m
+    networks: [meshly]
+
   auth-postgres:
     image: postgres:16.4-alpine
     restart: unless-stopped
@@ -260,3 +295,4 @@ volumes:
   order-postgres-data:
   payment-postgres-data:
   rabbitmq-data:
+  letsencrypt-data:

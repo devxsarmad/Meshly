@@ -8,6 +8,7 @@ import { proxyRouter } from './routes/proxy';
 
 export const app = express();
 app.disable('x-powered-by');
+app.set('trust proxy', 1);
 app.use(cors({ origin: env.corsOrigin, credentials: true }));
 app.use(morgan('combined'));
 app.use(rateLimit({ windowMs: env.rateLimitWindowMs, limit: env.rateLimitMax, standardHeaders: 'draft-7', legacyHeaders: false }));
