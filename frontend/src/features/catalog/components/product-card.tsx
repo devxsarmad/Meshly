@@ -5,6 +5,7 @@ import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
 import { ProductImage } from '../../../components/ui/product-image';
 import { WishlistButton } from '../../wishlist/components/wishlist-button';
+import { formatCurrency } from '../../../lib/formatters';
 
 export type ProductCardData = {
   id: string;
@@ -53,9 +54,9 @@ export function ProductCard({ product, saved = false, onWishlistChange, showCate
           </Link>
         </div>
         {showDescription && product.description && <p className="mt-3 line-clamp-2 text-small text-text-secondary">{product.description}</p>}
-        {showStock && <div className="mt-5 flex items-center justify-between"><span className="font-mono text-small text-primary">${product.price.toFixed(2)}</span><span className="text-small text-text-secondary">{(product.inventoryCount || 0) > 0 ? 'In stock' : 'Sold out'}</span></div>}
-        {!showStock && <p className="mt-2 font-mono text-small text-primary">${product.price.toFixed(2)}</p>}
-        {showAddToCart && <Button className="mt-6 w-full" disabled={addToCartBusy} onClick={onAddToCart}>{addToCartBusy ? 'Adding…' : addToCartLabel}</Button>}
+        {showStock && <div className="mt-5 flex items-center justify-between"><span className="font-mono text-small text-primary">{formatCurrency(product.price)}</span><span className="text-small text-text-secondary">{(product.inventoryCount || 0) > 0 ? 'In stock' : 'Sold out'}</span></div>}
+        {!showStock && <p className="mt-2 font-mono text-small text-primary">{formatCurrency(product.price)}</p>}
+        {showAddToCart && <Button className="mt-6 w-full" disabled={addToCartBusy || (product.inventoryCount ?? 1) <= 0} onClick={onAddToCart}>{addToCartBusy ? 'Adding…' : (product.inventoryCount ?? 1) <= 0 ? 'Sold out' : addToCartLabel}</Button>}
       </div>
     </Card>
   );

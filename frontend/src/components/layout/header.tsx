@@ -45,7 +45,7 @@ export function Header() {
           <MeshlyMark size="sm" />
           Meshly<span className="text-accent">.</span>
         </Link>
-        <nav className="hidden items-center gap-7 text-small md:flex">
+        <nav className="hidden items-center gap-7 text-small md:flex" aria-label="Main navigation">
           <Link href="/catalog" className={navItem(pathname.startsWith('/catalog'))}>Catalog</Link>
           {user && <>
             <Link href="/cart" className={navItem(pathname === '/cart')}>Cart</Link>
