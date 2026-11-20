@@ -22,13 +22,16 @@ function WishlistContent() {
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
   useEffect(() => {
+    let active = true;
     getWishlist()
-      .then(setItems)
+      .then((result) => { if (active) setItems(result); })
       .catch((reason: Error) => {
+        if (!active) return;
         setError(reason.message);
         notify("error", reason.message);
       })
-      .finally(() => setLoading(false));
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, []);
   async function moveToCart(item: WishlistItem) {
     setBusyId(item.productId);
@@ -72,7 +75,7 @@ function WishlistContent() {
           <Button
             className="mt-5"
             variant="secondary"
-            onClick={() => window.location.reload()}
+            onClick={() => { setError(""); setLoading(true); getWishlist().then(setItems).catch((reason: Error) => { setError(reason.message); notify("error", reason.message); }).finally(() => setLoading(false)); }}
           >
             Try again
           </Button>
