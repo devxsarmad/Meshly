@@ -16,6 +16,8 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, retry = 
     refreshInFlight ||= refreshSession();
     try {
       await refreshInFlight;
+    } catch {
+      // Retry once so the request surfaces the API's normal authorization error.
     } finally {
       refreshInFlight = null;
     }
