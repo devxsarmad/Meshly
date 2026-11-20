@@ -25,8 +25,8 @@ export function ProductImage({ src, alt, className = '', zoomOnHover = false }: 
 
   if (failed || !src) {
     return (
-      <div className={`flex h-full w-full items-center justify-center bg-primary/5 ${className}`} aria-label={`${alt} image unavailable`}>
-        <LoadingDots />
+      <div className={`flex h-full w-full items-center justify-center bg-primary/5 ${className}`} role="img" aria-label={`${alt} image unavailable`}>
+        <span className="text-small text-text-secondary" aria-hidden="true">Image unavailable</span>
       </div>
     );
   }
